@@ -53,4 +53,4 @@ Ce projet m’a permis de mettre en pratique mes compétences en :
 
 👨‍💻 *Développé par Guillaume Ottolini, étudiant à Rennes School of Business et ex pilote de l’Équipe de France Junior de vol en planeur.*  
 
-📫 *Contact : guillaume.ottolini@gmail.com
+📫 Contact : guillaume.ottolini@gmail.com
