@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Centrage Ventus 2a F-CJPR</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icon_192.png" />
+    <link rel="apple-touch-icon" href="icon_512.png" />
+    <meta name="theme-color" content="#007BFF" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h2 {
+            color: #004080;
+        }
+        label, input, button {
+            font-size: 1.2em;
+        }
+        input {
+            width: 100px;
+            margin-left: 10px;
+        }
+        button {
+            padding: 8px 20px;
+            margin-top: 10px;
+        }
+        .resultat {
+            margin-top: 20px;
+            font-size: 1.1em;
+            background-color: #e0f0ff;
+            padding: 10px;
+            border-radius: 8px;
+            white-space: pre-line; /* pour afficher les sauts de ligne */
+        }
+        .info {
+            font-size: 1.1em;
+            color: #3333cc;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Centrage Ventus 2a F-CJPR</h2>
+
+    <div class="info">
+        Données figées Ventus 2a F-CJPR :<br>
+        - Masse planeur : 240.4 kg | Bras planeur vide : 632 mm<br>
+        - Masse parachute : 7 kg | Bras parachute : 455 mm<br>
+        - Masse bagages : 2 kg | Bras bagages : 455 mm<br>
+        - Bras des gueuses : 1635 mm<br>
+        Plage optimale de centrage = 320 mm (71.4%) - 340 mm (85.7%)
+    </div>
+
+    <label>Poids pilote (kg) : <input type="number" id="M_pilote"></label><br><br>
+    <label>Ballast ailes (litres) : <input type="number" id="ballast_ailes"></label><br><br>
+    <label>Ballast queue (kg) : <input type="number" id="ballast_queue"></label><br><br>
+    <label>Batterie queue (kg) : <input type="number" id="batterie_queue"></label><br><br>
+    <label>Masse gueuses déjà installée (kg) : <input type="number" id="masse_gueuses"></label><br><br>
+    <label>Centrage cible (mm) : <input type="number" id="cg_cible"></label><br><br>
+
+    <button onclick="calculer()">Calculer</button>
+
+    <div class="resultat" id="resultat"></div>
+
+    <script>
+        function calculer() {
+            const limite_av = 220;
+            const limite_ar = 360;
+            const plage_min = 320;
+            const plage_max = 340;
+
+            const M_planeur = 240.4;
+            const x_planeur = 0.632;
+            const M_parachute = 7;
+            const x_parachute = 0.455;
+            const M_bagages = 2;
+            const x_bagages = 0.455;
+            const x_gueuses = 1.635;
+
+            const M_pilote = parseFloat(document.getElementById("M_pilote").value);
+            const ballast_ailes = parseFloat(document.getElementById("ballast_ailes").value);
+            const ballast_queue = parseFloat(document.getElementById("ballast_queue").value);
+            const batterie_queue = parseFloat(document.getElementById("batterie_queue").value);
+            const masse_gueuses = parseFloat(document.getElementById("masse_gueuses").value);
+            const cg_cible_mm = parseFloat(document.getElementById("cg_cible").value);
+
+            if (isNaN(M_pilote) || isNaN(ballast_ailes) || isNaN(ballast_queue) || isNaN(batterie_queue) || isNaN(masse_gueuses) || isNaN(cg_cible_mm)) {
+                alert("Veuillez entrer des nombres valides dans tous les champs.");
+                return;
+            }
+
+            const x_pilote = 0.455;
+            const x_ballast_ailes = 0.179;
+            const x_ballast_queue = 3.9;
+            const x_batterie_queue = 3.9;
+            const cg_cible = cg_cible_mm / 1000;
+
+            const moment_arriere = M_planeur * x_planeur + ballast_ailes * x_ballast_ailes + ballast_queue * x_ballast_queue + batterie_queue * x_batterie_queue;
+            const moment_avant = M_pilote * x_pilote + M_parachute * x_parachute + M_bagages * x_bagages + masse_gueuses * x_gueuses;
+
+            const M_tot = M_planeur + M_pilote + M_parachute + M_bagages + ballast_ailes + ballast_queue + batterie_queue + masse_gueuses;
+            const moment_total = moment_arriere - moment_avant;
+            const cg_actuel_m = moment_total / M_tot;
+            const cg_actuel_mm = cg_actuel_m * 1000;
+
+            const masse_gueuses_necessaire = (moment_total - M_tot * cg_cible) / x_gueuses;
+            const action = masse_gueuses_necessaire > 0 ? "Ajouter" : "Retirer";
+
+            const pct = x => ((x - limite_av) / (limite_ar - limite_av)) * 100;
+
+            const texte =
+                `Centrage actuel : ${cg_actuel_mm.toFixed(1)} mm (${pct(cg_actuel_mm).toFixed(1)}%)\n` +
+                `${action} environ ${Math.abs(masse_gueuses_necessaire).toFixed(2)} kg de gueuses\n` +
+                `pour atteindre le centrage cible : ${cg_cible_mm.toFixed(1)} mm (${pct(cg_cible_mm).toFixed(1)}%)\n` +
+                (cg_actuel_mm >= plage_min && cg_actuel_mm <= plage_max ? "\n✅ Le centrage est dans la plage optimale." : "");
+
+            document.getElementById("resultat").innerText = texte;
+        }
+
+        // Enregistrement du service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log('Service Worker enregistré !'))
+                    .catch(err => console.log('Erreur SW :', err));
+            });
+        }
+    </script>
+
+</body>
+</html>

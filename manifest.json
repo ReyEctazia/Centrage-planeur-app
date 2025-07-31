@@ -1,0 +1,21 @@
+{
+  "name": "Centrage Ventus 2a",
+  "short_name": "Centrage",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f8ff",
+  "theme_color": "#007BFF",
+  "description": "Calculateur de centrage pour Ventus 2a F-CJPR",
+  "icons": [
+    {
+      "src": "icon_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
