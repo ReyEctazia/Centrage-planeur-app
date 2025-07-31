@@ -1,4 +1,4 @@
-# Application de calcul de centrage en planeur ✈️
+# Application web autonome pour le calcul de centrage en planeur ✈️
 
 Application web autonome développée dans le cadre de ma préparation aux Championnats de France Junior de vol en planeur.
 
